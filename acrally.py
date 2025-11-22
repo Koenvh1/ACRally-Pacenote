@@ -25,9 +25,10 @@ class ACRally:
         self.distance = None
 
         self.notes_list = yaml.safe_load(open(f"pacenotes/{stage}.yml"))
-        try:
+        if self.notes_list is not None:
             self.distance = self.notes_list[0]["distance"]
-        except IndexError:
+        else:
+            self.notes_list = []
             self.distance = 0
         print(self.distance)
 
