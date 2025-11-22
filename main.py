@@ -2,6 +2,8 @@ import os
 import tkinter as tk
 from tkinter import ttk
 
+import yaml
+
 from acrally import ACRally
 
 
@@ -28,6 +30,8 @@ class Main:
         self.btn_stop["state"] = "disabled"
 
     def __init__(self):
+        config = yaml.safe_load(open("config.yml"))
+
         root = tk.Tk()
         root.title("AC Rally Pacenote Pal")
         root.geometry("340x360")
@@ -53,7 +57,7 @@ class Main:
         voices = os.listdir("voices")
         ttk.Label(root, text="Select a voice:").pack(pady=(20, 5))
         self.voices = ttk.Combobox(root, values=voices, width=50)
-        self.voices.current(0)
+        self.voices.current(voices.index(config["voice"]))
         self.voices.pack(pady=5)
 
         ttk.Label(root, text="Call earliness multiplier (higher is earlier):").pack(pady=(20, 5))
@@ -62,7 +66,7 @@ class Main:
             from_=0.00,
             to=10.00,
             increment=0.01,
-            textvariable=tk.DoubleVar(value=1),
+            textvariable=tk.DoubleVar(value=float(config["call_distance"])),
             format="%.2f",
             width=10
         )
