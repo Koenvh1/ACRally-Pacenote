@@ -24,7 +24,10 @@ class ACRally:
         self.distance = None
 
         self.notes_list = yaml.safe_load(open(f"pacenotes/{stage}.yml"))
-        self.distance = self.notes_list[0]["distance"]
+        try:
+            self.distance = self.notes_list[0]["distance"]
+        except IndexError:
+            self.distance = 0
         print(self.distance)
 
         retrieve = Thread(target=self.retrieve_thread, daemon=True)
