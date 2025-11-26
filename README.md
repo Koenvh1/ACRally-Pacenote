@@ -98,6 +98,9 @@ to create e.g. `Into-Left6.wav` which will play for the pacenote `[Into, Left6]`
 possible to create multiple options for this by adding a `_1`, `_2`, etc., like `Into-Left6_2.wav`. 
 It will pick one at random.
 
+Custom notes should ideally consist of letters and numbers. Please use the UpperCamelCase convention, and
+avoid names with only numbers and special characters.
+
 Thanks to
 ---------
 - pyaccsharedmemory.py is based on https://github.com/rrennoir/PyAccSharedMemory
