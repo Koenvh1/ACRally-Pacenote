@@ -92,6 +92,12 @@ e.g. `After.wav`, `After_1.wav`, `After_2.wav`. It will randomly pick one of the
 ACR uses 6 for the widest turn and 1 for the tightest turn. Depending on the voice you could make the audio for
 Left6 sound like "1 Left", "Fast Left", or something else instead.
 
+It is possible to create a combination of notes by chaining them using a dash (`-`). This way it is possible
+to create e.g. `Into-Left6.wav` which will play for the pacenote `[Into, Left6]` rather than `Into.wav` and 
+`Left6.wav`. There is no limit to this, so `Into-Left6-And-Right5-VeryLong.wav` will also work. It is also 
+possible to create multiple options for this by adding a `_1`, `_2`, etc., like `Into-Left6_2.wav`. 
+It will pick one at random.
+
 Thanks to
 ---------
 - pyaccsharedmemory.py is based on https://github.com/rrennoir/PyAccSharedMemory

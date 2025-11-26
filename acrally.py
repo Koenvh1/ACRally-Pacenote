@@ -109,7 +109,6 @@ class ACRally:
             if self.notes_list[0]["distance"] < self.distance + (120 + (self.speed_kmh // 2)) * self.call_earliness:
                 note = self.notes_list.pop(0)
                 tokens = note["notes"]
-                # print(tokens)
                 link_to_next = note["link_to_next"]
                 while link_to_next:
                     next_note = self.notes_list.pop(0)
@@ -117,7 +116,10 @@ class ACRally:
                     tokens.extend(next_tokens)
                     link_to_next = next_note["link_to_next"]
 
+                tokens = self.combine_tokens(tokens, token_sounds)
+
                 for token in tokens:
+                    print(token)
                     if token in token_sounds:
                         sound = random.choice(token_sounds[token])
                         winsound.PlaySound(sound, winsound.SND_MEMORY | winsound.SND_NODEFAULT | winsound.SND_NOSTOP)
@@ -129,6 +131,23 @@ class ACRally:
             else:
                 time.sleep(0.1)
         print("Speak thread closed")
+
+    def combine_tokens(self, tokens, token_sounds):
+        new_tokens = []
+        i = 0
+        longest_match = []
+        while i + len(longest_match) < len(tokens):
+            for token in tokens[i:]:
+                key = longest_match + [token]
+                if "-".join(key) in token_sounds:
+                    longest_match = key
+                else:
+                    new_tokens.append("-".join(longest_match))
+                    i += len(longest_match)
+                    longest_match = []
+                    break
+        new_tokens.append("-".join(longest_match))
+        return new_tokens
 
     def get_distance(self):
         return self.distance
