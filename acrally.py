@@ -45,12 +45,11 @@ class ACRally:
         last_shared_memory = None
 
         handbrake_pressed = False
-
         if self.handbrake:
-            handbrake = Handbrake(self.handbrake)
-
             def check_pressed_2s():
                 nonlocal handbrake_pressed
+
+                handbrake = Handbrake(self.handbrake)
                 while not self.started and not self.exit_all:
                     if handbrake.get_pressed():
                         time.sleep(2)

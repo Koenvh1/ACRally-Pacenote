@@ -11,14 +11,17 @@ import pygame
 
 
 class Handbrake:
+    joysticks = None
+
     @staticmethod
     def get_joysticks():
         if not pygame.get_init():
             pygame.init()
         if not pygame.joystick.get_init():
             pygame.joystick.init()
-        joysticks = [pygame.joystick.Joystick(x) for x in range(pygame.joystick.get_count())]
-        return joysticks
+        if not Handbrake.joysticks:
+            Handbrake.joysticks = [pygame.joystick.Joystick(x) for x in range(pygame.joystick.get_count())]
+        return Handbrake.joysticks
 
     def __init__(self, config):
         self.joystick = None
