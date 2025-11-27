@@ -139,10 +139,13 @@ class ACRally:
         longest_match = []
         while i + len(longest_match) < len(tokens):
             for token in tokens[i:]:
+                token = str(token)
                 key = longest_match + [token]
                 if "-".join(key) in token_sounds:
                     longest_match = key
                 else:
+                    if len(longest_match) == 0:
+                        longest_match.append(token)
                     new_tokens.append("-".join(longest_match))
                     i += len(longest_match)
                     longest_match = []
