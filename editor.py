@@ -72,6 +72,13 @@ class Editor:
         self.pacenote_vars = []
 
         def draw_pacenotes(i, pacenote):
+            def pacenote_remove(i=i):
+                self.pacenotes.pop(i)
+                self.draw_pacenotes_frame()
+            remove_btn = ttk.Button(self.scroll_frame.scrollable_frame, text="🗑", width=3, command=pacenote_remove)
+            remove_btn.grid(row=i, column=0, padx=5, pady=5)
+            self.pacenote_elements.append(remove_btn)
+
             distance_var = tk.StringVar(value=str(int(pacenote["distance"])))
             distance_entry = ttk.Entry(self.scroll_frame.scrollable_frame, textvariable=distance_var, width=6)
             distance_entry.grid(row=i, column=1, padx=5, pady=5)
@@ -107,15 +114,11 @@ class Editor:
             combined_pacenotes_frame = None
 
             def draw_pacenotes(
-                    pacenotes_frame=pacenotes_frame,
-                    combined_pacenotes_frame=combined_pacenotes_frame,
-                    pacenote=pacenote,
                     i=i
             ):
+                nonlocal pacenotes_frame
                 if pacenotes_frame:
                     pacenotes_frame.destroy()
-                if combined_pacenotes_frame:
-                    combined_pacenotes_frame.destroy()
                 pacenotes_frame = ttk.Frame(self.scroll_frame.scrollable_frame)
                 pacenotes_frame.grid(row=i, column=3, padx=5, pady=5, sticky="w")
 
@@ -129,23 +132,21 @@ class Editor:
                     note_combo.grid(row=note_idx, column=0)
 
                     def note_change(e, note_idx=note_idx):
-                        self.pacenotes[i]["notes"][note_idx] = note_var.get()
-                        draw_pacenotes(
-                            pacenotes_frame,
-                            combined_pacenotes_frame,
-                            pacenote,
-                            i
-                        )
+                        new_note = note_var.get()
+                        old_note = self.pacenotes[i]["notes"][note_idx]
+                        if old_note != new_note:
+                            self.pacenotes[i]["notes"][note_idx] = new_note
+                            draw_playable_pacenotes(
+                                i
+                            )
                     note_combo.bind("<FocusOut>", note_change)
+                    note_combo.bind("<<ComboboxSelected>>", note_change)
                     note_combo.bind("<Return>", note_change)
                     self.pacenote_vars.append(note_var)
 
                     def note_up(note_idx=note_idx):
                         self.pacenotes[i]["notes"].insert(note_idx - 1, self.pacenotes[i]["notes"].pop(note_idx))
                         draw_pacenotes(
-                            pacenotes_frame,
-                            combined_pacenotes_frame,
-                            pacenote,
                             i
                         )
 
@@ -157,9 +158,6 @@ class Editor:
                     def note_down(note_idx=note_idx):
                         self.pacenotes[i]["notes"].insert(note_idx + 1, self.pacenotes[i]["notes"].pop(note_idx))
                         draw_pacenotes(
-                            pacenotes_frame,
-                            combined_pacenotes_frame,
-                            pacenote,
                             i
                         )
 
@@ -171,9 +169,6 @@ class Editor:
                     def note_remove(note_idx=note_idx):
                         self.pacenotes[i]["notes"].pop(note_idx)
                         draw_pacenotes(
-                            pacenotes_frame,
-                            combined_pacenotes_frame,
-                            pacenote,
                             i
                         )
 
@@ -186,16 +181,22 @@ class Editor:
                 def add_note(i=i):
                     self.pacenotes[i]["notes"].append("")
                     draw_pacenotes(
-                        pacenotes_frame,
-                        combined_pacenotes_frame,
-                        pacenote,
                         i
                     )
                 add_button = ttk.Button(pacenotes_frame, text="+ Add", command=add_note)
                 add_button.grid(row=len(pacenote["notes"]), column=1, columnspan=3)
                 self.pacenote_elements.append(pacenotes_frame)
+                draw_playable_pacenotes(
+                    i
+                )
 
-                playable_tokens = self.acrally.combine_tokens(pacenote["notes"], self.token_sounds)
+            def draw_playable_pacenotes(
+                    i=i
+            ):
+                nonlocal combined_pacenotes_frame
+                if combined_pacenotes_frame:
+                    combined_pacenotes_frame.destroy()
+                playable_tokens = self.acrally.combine_tokens(self.pacenotes[i]["notes"], self.token_sounds)
                 combined_pacenotes_frame = ttk.Frame(self.scroll_frame.scrollable_frame)
                 combined_pacenotes_frame.grid(row=i, column=4, padx=5, pady=5, sticky="w")
                 for t in playable_tokens:
@@ -212,10 +213,22 @@ class Editor:
                 play_btn.pack(anchor="w")
                 self.pacenote_elements.append(play_btn)
                 self.pacenote_elements.append(combined_pacenotes_frame)
+
             draw_pacenotes()
 
         for i, pacenote in enumerate(self.pacenotes):
             draw_pacenotes(i, pacenote)
+
+        def pacenote_add():
+            self.pacenotes.append({
+                "distance": 99999,
+                "link_to_next": False,
+                "notes": [""]
+            })
+            self.draw_pacenotes_frame()
+        add_btn = ttk.Button(self.scroll_frame.scrollable_frame, text="+ Add pacenote", command=pacenote_add)
+        add_btn.grid(row=len(self.pacenotes), column=1, columnspan=2, padx=5, pady=5)
+        self.pacenote_elements.append(add_btn)
 
     def main(self):
         root = tk.Tk()
