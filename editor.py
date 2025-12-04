@@ -52,7 +52,7 @@ class Editor:
         if self.pacenotes:
             res = mb.askyesno("Load Pacenotes", "Are you sure you want to load these pacenotes? "
                                                 "All unsaved changed will be lost!")
-            if res != "yes":
+            if not res:
                 return
         self.acrally = ACRally(
             self.pacenotes_combo.get(),
@@ -73,7 +73,7 @@ class Editor:
                           f"Are you sure you want to save your pacenotes to \"{self.pacenotes_combo.get()}.yml\"? "
                           f"Existing content will be overwritten!")
 
-        if res == "yes":
+        if res:
             yaml.dump(
                 self.pacenotes,
                 open(f"pacenotes/{self.pacenotes_combo.get()}.yml", "w"),
