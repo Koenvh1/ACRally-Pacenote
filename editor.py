@@ -49,6 +49,11 @@ class Editor:
         self.pacenote_options = []
 
     def load_pacenotes(self):
+        if self.pacenotes:
+            res = mb.askyesno("Load Pacenotes", "Are you sure you want to load these pacenotes? "
+                                                "All unsaved changed will be lost!")
+            if res != "yes":
+                return
         self.acrally = ACRally(
             self.pacenotes_combo.get(),
             self.voices_combo.get(),
@@ -61,10 +66,6 @@ class Editor:
         self.pacenote_options = [x for x in self.token_sounds.keys() if "-" not in x]
         self.pacenote_options.extend(["Pause0.1s", "Pause0.25s", "Pause0.5s", "Pause1.0s", "Pause1.5s"])
         self.save_button["state"] = "normal"
-        # import cProfile
-        # p = cProfile.Profile()
-        # p.runcall(self.draw_pacenotes_frame)
-        # p.print_stats()
         self.draw_pacenotes_frame()
 
     def save_pacenotes(self):

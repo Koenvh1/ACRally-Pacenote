@@ -97,7 +97,7 @@ class Main:
         call_distance_spinbox = ttk.Spinbox(settings_frame, textvariable=call_distance_var, from_=0.1, to=5.0, increment=0.1)
         call_distance_spinbox.grid(column=1, row=1, padx=5, pady=5)
 
-        ttk.Label(settings_frame, text="Multiplier for the call distance.\n"
+        ttk.Label(settings_frame, text="Multiplier for the call distance:\n"
                                        "2.0 makes the calls twice as early,\n"
                                        "0.5 makes them very late."
                   ).grid(column=0, columnspan=2, row=2, sticky="W")
