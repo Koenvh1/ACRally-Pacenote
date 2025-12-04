@@ -1,10 +1,12 @@
 import os
 import threading
 import tkinter as tk
+import tkinter.messagebox as mb
 from tkinter import ttk
 
 import yaml
 
+import util
 from acrally import ACRally
 
 
@@ -35,6 +37,8 @@ class Editor:
         self.scroll_frame = None
         self.pacenotes_combo = None
         self.voices_combo = None
+        self.load_button = None
+        self.save_button = None
 
         self.acrally = None
         self.pacenote_elements = []
@@ -56,15 +60,25 @@ class Editor:
         self.pacenotes = yaml.safe_load(open(f"pacenotes/{self.pacenotes_combo.get()}.yml"))
         self.pacenote_options = [x for x in self.token_sounds.keys() if "-" not in x]
         self.pacenote_options.extend(["Pause0.1s", "Pause0.25s", "Pause0.5s", "Pause1.0s", "Pause1.5s"])
+        self.save_button["state"] = "normal"
+        # import cProfile
+        # p = cProfile.Profile()
+        # p.runcall(self.draw_pacenotes_frame)
+        # p.print_stats()
         self.draw_pacenotes_frame()
 
     def save_pacenotes(self):
-        yaml.dump(
-            self.pacenotes,
-            open(f"pacenotes/{self.pacenotes_combo.get()}.yml", "w"),
-            default_flow_style=None,
-            sort_keys=False
-        )
+        res = mb.askyesno("Save Pacenotes",
+                          f"Are you sure you want to save your pacenotes to \"{self.pacenotes_combo.get()}.yml\"? "
+                          f"Existing content will be overwritten!")
+
+        if res == "yes":
+            yaml.dump(
+                self.pacenotes,
+                open(f"pacenotes/{self.pacenotes_combo.get()}.yml", "w"),
+                default_flow_style=None,
+                sort_keys=False
+            )
 
     def draw_pacenotes_frame(self):
         [x.destroy() for x in self.pacenote_elements]
@@ -75,7 +89,7 @@ class Editor:
             def pacenote_remove(i=i):
                 self.pacenotes.pop(i)
                 self.draw_pacenotes_frame()
-            remove_btn = ttk.Button(self.scroll_frame.scrollable_frame, text="🗑", width=3, command=pacenote_remove)
+            remove_btn = ttk.Button(self.scroll_frame.scrollable_frame, text="🗙", width=3, command=pacenote_remove)
             remove_btn.grid(row=i, column=0, padx=5, pady=5)
             self.pacenote_elements.append(remove_btn)
 
@@ -130,6 +144,7 @@ class Editor:
                         textvariable=note_var
                     )
                     note_combo.grid(row=note_idx, column=0)
+                    note_combo.unbind_class("TCombobox", "<MouseWheel>")
 
                     def note_change(e, note_idx=note_idx):
                         new_note = note_var.get()
@@ -150,7 +165,7 @@ class Editor:
                             i
                         )
 
-                    note_up = ttk.Button(pacenotes_frame, text="↑", width=3, command=note_up)
+                    note_up = ttk.Button(pacenotes_frame, text="▲", width=3, command=note_up)
                     note_up.grid(row=note_idx, column=1)
                     if note_idx == 0:
                         note_up["state"] = "disabled"
@@ -161,7 +176,7 @@ class Editor:
                             i
                         )
 
-                    note_down = ttk.Button(pacenotes_frame, text="↓", width=3, command=note_down)
+                    note_down = ttk.Button(pacenotes_frame, text="▼", width=3, command=note_down)
                     note_down.grid(row=note_idx, column=2)
                     if note_idx == len(pacenote["notes"]) - 1:
                         note_down["state"] = "disabled"
@@ -172,7 +187,7 @@ class Editor:
                             i
                         )
 
-                    note_remove = ttk.Button(pacenotes_frame, text="🗑", width=3, command=note_remove)
+                    note_remove = ttk.Button(pacenotes_frame, text="🗙", width=3, command=note_remove)
                     note_remove.grid(row=note_idx, column=3)
 
                 for note_idx, t in enumerate(pacenote["notes"]):
@@ -219,20 +234,32 @@ class Editor:
         for i, pacenote in enumerate(self.pacenotes):
             draw_pacenotes(i, pacenote)
 
+        def swap_rows(r1, r2):
+            row1 = self.scroll_frame.scrollable_frame.grid_slaves(row=r1)
+            row2 = self.scroll_frame.scrollable_frame.grid_slaves(row=r2)
+
+            for w in row1:
+                w.grid(row=r2)
+
+            for w in row2:
+                w.grid(row=r1)
+
         def pacenote_add():
             self.pacenotes.append({
-                "distance": 99999,
+                "distance": 0,
                 "link_to_next": False,
                 "notes": [""]
             })
-            self.draw_pacenotes_frame()
+            add_btn.grid(row=len(self.pacenotes))
+            draw_pacenotes(len(self.pacenotes) - 1, self.pacenotes[len(self.pacenotes) - 1])
         add_btn = ttk.Button(self.scroll_frame.scrollable_frame, text="+ Add pacenote", command=pacenote_add)
         add_btn.grid(row=len(self.pacenotes), column=1, columnspan=2, padx=5, pady=5)
         self.pacenote_elements.append(add_btn)
 
     def main(self):
-        root = tk.Tk()
+        root = tk.Toplevel()
         root.title("AC Rally Pacenote Pal editor")
+        root.iconbitmap(util.resource_path("icon.ico"))
         root.geometry("600x600")
 
         top_frame = ttk.Frame(root, padding=10)
@@ -250,11 +277,12 @@ class Editor:
         self.pacenotes_combo.grid(row=0, column=0, padx=5, pady=5)
         self.voices_combo.grid(row=0, column=1, padx=5, pady=5)
 
-        load_button = ttk.Button(top_frame, text="Load", command=self.load_pacenotes)
-        load_button.grid(row=0, column=2, padx=10, pady=5)
+        self.load_button = ttk.Button(top_frame, text="Load", command=self.load_pacenotes)
+        self.load_button.grid(row=0, column=2, padx=10, pady=5)
 
-        save_button = ttk.Button(top_frame, text="Save", command=self.save_pacenotes)
-        save_button.grid(row=0, column=3, padx=10, pady=5)
+        self.save_button = ttk.Button(top_frame, text="Save", command=self.save_pacenotes)
+        self.save_button.grid(row=0, column=3, padx=10, pady=5)
+        self.save_button["state"] = "disabled"
 
         # Scrollable frame
         self.scroll_frame = ScrollableFrame(root)

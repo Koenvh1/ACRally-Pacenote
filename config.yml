@@ -1,3 +1,5 @@
+# Please restart Pacenote Pal after changing the settings
+
 # The voice to use, corresponds to the folder name of the voice
 voice: Dutch
 # The multiplier for the call distance. 2.0 makes the calls twice as early, 0.5 makes them very late
