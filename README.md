@@ -42,19 +42,8 @@ To set this up, execute HandbrakeHelper.exe and follow the steps to generate a c
 Once this is set up, engaging the handbrake for at least 70% for two seconds will also trigger the start 
 of the stage.
 
-Creating your own pacenotes from scratch
-----------------------------------------
-
-Create an empty YAML file for your pacenotes in the `pacenotes` folder, e.g. `My Notes.yml`. 
-Add a single empty pacenote to it and save the file, i.e.:
-```
-- distance: 0
-  link_to_next: false
-  notes: []
-```
-When you (re)start Pacenote Pal, you should see the file in the list. Select it and press start.
-Now you can start the stage as normal and start making your pacenotes.
-
+Creating your own pacenotes by hand
+-----------------------------------
 A pacenote consists of three things:
 1. `distance` - This is the distance into the stage for this pacenote in metres. Press the "Distance" button to
 show the current distance. The codriver will call out this pacenote some time before the pacenote, so you do not 
@@ -65,6 +54,31 @@ out immediately after it as well.
 folder, and you can also add your own audio files if you want notes that are not in the game (e.g. sumppu). If the
 file does not exist it will be skipped. The audio files have to be .wav. Additionally, you can add fixed pauses by
 adding `PauseX.Ys`, e.g. `Pause1.5s` to pause for 1.5 seconds. The file names are case-sensitive.
+
+The easiest way is to use the pacenote editor. You can also do it manually.
+
+### Pacenote Editor  
+Load an existing file from the box on the top left, and select the voice to use. The voice influences the example
+that plays, and highlights which notes are missing from the audio. You can also type freely into this textbox.
+
+The first column is for removing the note, the second column for the distance in metres (see the odometer), it
+automatically reorders them based on the distance. The third column is whether this note should be linked to the 
+next. The fourth column are the notes that it should play, and their ordering. The fifth column shows which
+audio files the pacenote is translated to, and allows you to play a demo of what it will sound like in the stage.
+Missing files will be highlighted in red.
+
+![Pacenote Editor](docs/pacenote-editor.png)
+
+### Manually  
+Create an empty YAML file for your pacenotes in the `pacenotes` folder, e.g. `My Notes.yml`. 
+Add a single empty pacenote to it and save the file, i.e.:
+```
+- distance: 0
+  link_to_next: false
+  notes: []
+```
+When you (re)start Pacenote Pal, you should see the file in the list. Select it and press start.
+Now you can start the stage as normal and start making your pacenotes.
 
 The pacenote editor can help verify that the pacenotes you entered are the ones you intended, and you did not make
 typos or other errors.
